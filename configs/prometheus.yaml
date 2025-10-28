@@ -1,0 +1,4 @@
+name: prometheus
+compose_files:
+    - examples/prometheus/docker-compose.yaml
+description: Registered via kron compose add prometheus
