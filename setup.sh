@@ -41,7 +41,7 @@ CONFIG_DIR="$HOME/.kron"
 mkdir -p "$CONFIG_DIR"
 if [ ! -f "$CONFIG_DIR/setup.yaml" ]; then
   echo "📦 Copying default setup configuration..."
-  cp configs/kron/setup.yaml "$CONFIG_DIR/setup.yaml"
+  cp configs/setup/setup.yaml "$CONFIG_DIR/setup.yaml"
 else
   echo "✅ Existing ~/.kron/setup.yaml found, skipping copy."
 fi

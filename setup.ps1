@@ -41,7 +41,7 @@ if (-not (Test-Path $ConfigDir)) {
 
 if (-not (Test-Path "$ConfigDir\setup.yaml")) {
   Write-Host "📦 Copying default setup configuration..."
-  Copy-Item "configs\setup.yaml" "$ConfigDir\setup.yaml"
+  Copy-Item "configs\setup\setup.yaml" "$ConfigDir\setup.yaml"
 } else {
   Write-Host "✅ Existing setup.yaml found, skipping copy."
 }

@@ -1,0 +1,49 @@
+tools:
+  docker:
+    description: "Install and configure Docker Engine & Compose"
+    install_cmd:
+      linux: |
+        # Install Docker Engine and Compose plugin
+        sudo apt-get update -y
+        sudo apt-get install -y ca-certificates curl gnupg lsb-release
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+          https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update -y
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+        # Ensure docker group exists and add current user
+        sudo groupadd docker 2>/dev/null || true
+        sudo usermod -aG docker $USER
+
+        # Apply group changes
+        newgrp docker <<EONG
+        docker --version
+        docker compose version
+        EONG
+      darwin: |
+        brew install --cask docker
+      windows: |
+        echo "Please install Docker Desktop manually: https://www.docker.com/products/docker-desktop/"
+    uninstall_cmd:
+      linux: |
+        # Stop Docker services
+        sudo systemctl stop docker.service docker.socket 2>/dev/null || true
+        sudo systemctl disable docker.service docker.socket 2>/dev/null || true
+
+        # Remove all Docker packages
+        sudo apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+
+        # Clean up residual data
+        sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /etc/apt/keyrings/docker.gpg /etc/apt/sources.list.d/docker.list
+
+        # Reload daemon
+        sudo systemctl daemon-reload
+        echo "✅ Docker and related components have been fully uninstalled."
+      darwin: |
+        brew uninstall --cask docker
+      windows: |
+        echo "Please uninstall Docker Desktop manually via Control Panel."
