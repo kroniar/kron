@@ -19,7 +19,8 @@ It provides a pluggable structure to add automation commands like:
 
 ## 🧩 Getting Started
 
-```bash
+'''bash
 git clone https://github.com/kroniar/kron.git
 cd kron
 go run main.go
+'''
