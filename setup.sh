@@ -19,18 +19,14 @@ go mod tidy
 
 # Build the binary
 echo "🔨 Building binary..."
-go build -o kron
+go build -o kron main.go
 
-# Choose global install path
+# Install path
 INSTALL_DIR="$HOME/.local/bin"
-
-# Create if not exists
 mkdir -p "$INSTALL_DIR"
-
-# Move binary
 mv kron "$INSTALL_DIR/"
 
-# Ensure path is set
+# Add to PATH if missing
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
   echo "🧩 Adding $INSTALL_DIR to PATH..."
   SHELL_RC="$HOME/.bashrc"
@@ -38,6 +34,16 @@ if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
   echo "export PATH=\"\$PATH:$INSTALL_DIR\"" >> "$SHELL_RC"
   echo "✅ Added to PATH. Restart your terminal or run:"
   echo "   source $SHELL_RC"
+fi
+
+# Copy default setup config
+CONFIG_DIR="$HOME/.kron"
+mkdir -p "$CONFIG_DIR"
+if [ ! -f "$CONFIG_DIR/setup.yaml" ]; then
+  echo "📦 Copying default setup configuration..."
+  cp configs/setup/setup.yaml "$CONFIG_DIR/setup.yaml"
+else
+  echo "✅ Existing ~/.kron/setup.yaml found, skipping copy."
 fi
 
 echo "✅ Kron installed successfully!"
