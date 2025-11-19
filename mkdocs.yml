@@ -1,0 +1,23 @@
+site_name: Kron Documentation
+site_url: https://kroniar.github.io/kron/
+repo_url: https://github.com/kroniar/kron/
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Overview: getting-started.md
+      - Installation: installation.md
+  - Commands:
+      - "All Commands": commands/index.md
+      - "kron setup": commands/kron_setup.md
+      - "kron version": commands/kron_version.md
+  - Configuration:
+      - Examples: config/examples.md
