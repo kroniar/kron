@@ -26,13 +26,20 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Welcome to Kron ⚙️ — run 'kron help' to see available commands")
 	},
+	// Execute() prints the error once, so Cobra shouldn't print it too
+	SilenceErrors: true,
+	// Runs after flags and args are parsed: flag/arg mistakes still show usage,
+	// errors while running (bad file, failed --set, ...) don't
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		cmd.SilenceUsage = true
+	},
 }
 
 // Execute runs the root command
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
 }
