@@ -53,7 +53,16 @@ Example:
 			return fmt.Errorf("invalid YAML: %v", err)
 		}
 
+		// An empty or comment-only file has no document at all, and "---", "~" or
+		// "null" gives a null root: treat both as an empty mapping so keys can be added
+		noDocument := len(content.Content) == 0
+		if noDocument {
+			content = yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{{Kind: yaml.MappingNode, Tag: "!!map"}}}
+		}
 		contentRootNode := content.Content[0]
+		if contentRootNode.Kind == yaml.ScalarNode && contentRootNode.Tag == "!!null" {
+			*contentRootNode = yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}
+		}
 
 		if action == "GET" {
 			keys := args[1:]
@@ -68,6 +77,13 @@ Example:
 		} else {
 			if len(args) > 1 {
 				return fmt.Errorf("unexpected argument %q: repeat --set for each key, e.g. --set a=1 --set b=2", args[1])
+			}
+			if contentRootNode.Kind != yaml.MappingNode {
+				kind := "a single value"
+				if contentRootNode.Kind == yaml.SequenceNode {
+					kind = "a list"
+				}
+				return fmt.Errorf("the top level of %s is %s, not key: value pairs, so --set can't add keys to it", filePath, kind)
 			}
 			// Parse every --set first, so a typo fails before anything is applied
 			type change struct{ key, value string }
@@ -134,7 +150,12 @@ Example:
 				return fmt.Errorf("failed to marshal YAML: %v", err)
 			}
 			enc.Close()
-			if err := os.WriteFile(filePath, buf.Bytes(), 0644); err != nil {
+			newData := buf.Bytes()
+			// yaml.v3 drops the comments of a comment-only file, so keep its original text on top
+			if noDocument && strings.TrimSpace(string(data)) != "" {
+				newData = append([]byte(strings.TrimRight(string(data), " \t\r\n")+"\n"), newData...)
+			}
+			if err := os.WriteFile(filePath, newData, 0644); err != nil {
 				return fmt.Errorf("failed to save file: %v", err)
 			}
 
